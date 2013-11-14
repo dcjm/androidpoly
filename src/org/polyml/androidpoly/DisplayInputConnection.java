@@ -24,39 +24,7 @@ public class DisplayInputConnection extends BaseInputConnection {
 
 	@Override
 	public boolean sendKeyEvent(KeyEvent event) {
-		display.setSelection(display.getText().length());
-		if (event.getAction() == KeyEvent.ACTION_DOWN) {
-			switch (event.getKeyCode()) {
-				case KeyEvent.KEYCODE_DEL:
-				{
-					int length = editable.length();
-					if (length == 0)
-						return true;
-					editable.replace(length-1, length, "");
-					return true;
-				}
-					
-				case KeyEvent.KEYCODE_ENTER:
-				{
-					display.sendInputText(editable.toString());
-					editable.clear();
-					display.append("\n");
-					return true;
-				}
-				
-				default:
-				{
-					int ch = event.getUnicodeChar();
-					if (ch < 256) {
-						String s = Character.toString((char)ch);
-						editable.append(s);
-						display.append(s);
-					}
-					return true;
-				}
-			}
-		}
-		return super.sendKeyEvent(event);
+		return display.keyPress(event) || super.sendKeyEvent(event);
 	}
 
 	@Override

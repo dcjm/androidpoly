@@ -82,10 +82,10 @@ public class DisplayView extends EditText {
 		}
 		return super.onTextContextMenuItem(id);
 	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		setSelection(getText().length());
+	
+	// Process a key press either in this class or in the DisplayInputConnection
+	public boolean keyPress(KeyEvent event) {
+		setSelection(getText().length()); // Move to the end
 		if (event.getAction() == KeyEvent.ACTION_DOWN) {
 			switch (event.getKeyCode()) {
 				case KeyEvent.KEYCODE_DEL:
@@ -94,6 +94,10 @@ public class DisplayView extends EditText {
 					if (length == 0)
 						return true;
 					editable.replace(length-1, length, "");
+					String text = this.getText().toString();
+					text = text.substring(0, text.length()-1);
+					setText(text);
+					setSelection(getText().length());
 					return true;
 				}
 					
@@ -117,7 +121,13 @@ public class DisplayView extends EditText {
 				}
 			}
 		}
-		return super.onKeyDown(keyCode, event);
+		return false;
+
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		return keyPress(event) || super.onKeyDown(keyCode, event);
 	}
 
 
