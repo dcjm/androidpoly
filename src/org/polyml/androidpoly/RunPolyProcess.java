@@ -6,18 +6,16 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 
-import android.content.Context;
-
 public class RunPolyProcess  {
 
 	private OutStream outStream;
 	private PrintStream writer;
-	private Context context;
+	private PolyGUIActivity activity;
 
-	public RunPolyProcess(OutStream outStream, Context context)
+	public RunPolyProcess(OutStream outStream, PolyGUIActivity activity)
 	{
 		this.outStream = outStream;
-		this.context = context;
+		this.activity = activity;
 	}
 
 	// Actually create the process and handle output.  This is
@@ -28,7 +26,7 @@ public class RunPolyProcess  {
 		try {
 		    // Executes the command.  The simplest way to get the Poly executable included in the
 			// APK is to pretend that it is a shared library and name it libXXX.so.
-			String libPath = context.getFilesDir().getParentFile().getPath();
+			String libPath = activity.getFilesDir().getParentFile().getPath();
 				
 		    Process process =
 		    		Runtime.getRuntime().exec(
@@ -49,6 +47,9 @@ public class RunPolyProcess  {
 		    
 		    // Waits for the command to finish.
 		    process.waitFor();
+		    // Terminate the GUI
+		    activity.notifyDone();
+		    
 		} catch (IOException e) {
 		    throw new RuntimeException(e);
 		} catch (InterruptedException e) {

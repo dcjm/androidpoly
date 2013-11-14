@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.text.util.Linkify;
 import android.view.KeyEvent;
@@ -19,10 +20,9 @@ import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-public class MainActivity extends Activity implements OutStream, Callback {
+public class PolyGUIActivity extends Activity implements OutStream, Callback {
 
 	private DisplayView display;
-//	private EditText inputText;
 	private RunPolyProcess polyProcess;
 	private Handler handler;
 	
@@ -102,6 +102,14 @@ public class MainActivity extends Activity implements OutStream, Callback {
 		msg.obj = s;
 		msg.sendToTarget();
 	}
+	
+	// Called when the Poly process has terminated
+	public void notifyDone() {
+		Message msg = Message.obtain();
+		msg.what = 2;
+		msg.setTarget(handler);
+		msg.sendToTarget();
+	}
 
 	@Override
 	public boolean handleMessage(Message msg) {
@@ -114,6 +122,9 @@ public class MainActivity extends Activity implements OutStream, Callback {
 		case 1:
 			polyProcess.handleInput((String)msg.obj);
 			break;
+			
+		case 2:
+			finish();
 		}
 		return false;
 	}
