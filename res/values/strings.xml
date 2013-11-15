@@ -5,5 +5,10 @@
     <string name="action_settings">Settings</string>
     <string name="about_poly">About Poly/ML</string>
     <string name="all_about_poly">Poly/ML is a full implementation of Standard ML.  For more information and for links to the source code go to http://www.polyml.org .</string>
+    <string name="settings">Settings</string>
+    <string name="heapSizeTitle">Heap Size</string>
+    <string name="heapSizeSummary">Set the maximum heap size</string>
+    <string name="defaultHeapSize">100</string>
+    <string name="interrupt">Send Interrupt</string>
 
 </resources>

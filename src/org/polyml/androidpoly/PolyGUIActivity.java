@@ -7,6 +7,7 @@ import android.os.Message;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -33,7 +34,7 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 		display = (DisplayView)findViewById(R.id.outputDisplay);
 		handler = new Handler(this);
 		display.setHandler(handler);
-		polyProcess = new RunPolyProcess(this, this);
+		polyProcess = new RunPolyProcess(this);
 		polyProcess.start();
 	}
 
@@ -51,20 +52,24 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 			case R.id.about_poly:
 				showAbout();
 				return true;
+				
+			case R.id.settings:
+			{
+				startActivity(new Intent(this, PolySettings.class));
+				return true;
+			}
+			
+			case R.id.interrupt:
+			{
+				if (polyProcess != null)
+					polyProcess.sendInterrupt();
+				return true;
+			}
 			
 			default:
 				return super.onOptionsItemSelected(item);
 				
 		}
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_MENU) {
-			showAbout();
-			return true;
-		}
-		return super.onKeyDown(keyCode, event);
 	}
 
 	private void showAbout() {
@@ -91,13 +96,17 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 		dialogue.setView(about);
 		dialogue.show();
 	}
+	
+	private static final int WRITE_TEXT = 0;
+	public static final int HANDLE_INPUT = 1;
+	private static final int POLY_PROCESS_DIED = 2;
 
 	// Called to append output from the Poly process.
 	// Because this is called on another thread it must send a message
 	// to do its work.
 	public void write(String s) {
 		Message msg = Message.obtain();
-		msg.what = 0;
+		msg.what = WRITE_TEXT;
 		msg.setTarget(handler);
 		msg.obj = s;
 		msg.sendToTarget();
@@ -106,7 +115,7 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 	// Called when the Poly process has terminated
 	public void notifyDone() {
 		Message msg = Message.obtain();
-		msg.what = 2;
+		msg.what = POLY_PROCESS_DIED;
 		msg.setTarget(handler);
 		msg.sendToTarget();
 	}
@@ -115,15 +124,16 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 	public boolean handleMessage(Message msg) {
 		switch (msg.what)
 		{
-		case 0:
+		case WRITE_TEXT:
 			display.append((String)msg.obj);
 			break;
 			
-		case 1:
-			polyProcess.handleInput((String)msg.obj);
+		case HANDLE_INPUT:
+			if (polyProcess != null)
+				polyProcess.handleInput((String)msg.obj);
 			break;
 			
-		case 2:
+		case POLY_PROCESS_DIED:
 			finish();
 		}
 		return false;

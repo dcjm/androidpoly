@@ -5,17 +5,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.lang.reflect.Field;
+
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class RunPolyProcess  {
 
 	private OutStream outStream;
 	private PrintStream writer;
 	private PolyGUIActivity activity;
+	private String heapSize;
+	private Process process;
 
-	public RunPolyProcess(OutStream outStream, PolyGUIActivity activity)
+	public RunPolyProcess(PolyGUIActivity activity)
 	{
-		this.outStream = outStream;
+		this.outStream = activity;
 		this.activity = activity;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+		heapSize = prefs.getString("heap_size", "100M");
 	}
 
 	// Actually create the process and handle output.  This is
@@ -28,9 +36,9 @@ public class RunPolyProcess  {
 			// APK is to pretend that it is a shared library and name it libXXX.so.
 			String libPath = activity.getFilesDir().getParentFile().getPath();
 				
-		    Process process =
+		    process =
 		    		Runtime.getRuntime().exec(
-		    				libPath + "/lib/libpolyexecutable.so -i");
+		    				libPath + "/lib/libpolyexecutable.so -i --maxheap " + heapSize);
 
 		    Reader reader = new BufferedReader(
 		            	new InputStreamReader(process.getInputStream()));
@@ -61,6 +69,22 @@ public class RunPolyProcess  {
 	public void handleInput(String s) {
 		if (writer != null)
 			writer.println(s);
+	}
+	
+	public void sendInterrupt() {
+		if (process != null) {
+			// This is a mess - the pid is a hidden field.  Given that
+			// Android provides sendSignal this is really an oversight.
+			try {
+				Field fs  = process.getClass().getDeclaredField("id");
+				fs.setAccessible(true);
+				int pid = fs.getInt(process);
+				android.os.Process.sendSignal(pid, 2);
+			} catch (NoSuchFieldException e) {
+			} catch (IllegalArgumentException e) {
+			} catch (IllegalAccessException e) {
+			}
+		}
 	}
 	
 	public void start()

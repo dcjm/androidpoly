@@ -45,7 +45,7 @@ public class DisplayView extends EditText {
     public void sendInputText(String s) {
     	if (mainHandler != null) {
     		Message msg = Message.obtain();
-    		msg.what = 1;
+    		msg.what = PolyGUIActivity.HANDLE_INPUT;
     		msg.setTarget(mainHandler);
     		msg.obj = s;
     		msg.sendToTarget();
