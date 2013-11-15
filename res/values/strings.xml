@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">Poly/ML</string>
@@ -10,5 +9,11 @@
     <string name="heapSizeSummary">Set the maximum heap size</string>
     <string name="defaultHeapSize">100</string>
     <string name="interrupt">Send Interrupt</string>
+    <string name="about_text">Poly/ML for Android version</string>
+    <string name="about">About</string>
+    <string name="ok">OK</string>
+    <string name="has_finished">The Poly process has closed</string>
+    <string name="restart">Restart Poly</string>
+    <string name="exit">Exit</string>
 
 </resources>

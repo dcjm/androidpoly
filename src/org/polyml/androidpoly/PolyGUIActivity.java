@@ -7,6 +7,7 @@ import android.os.Message;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
@@ -34,6 +35,10 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 		display = (DisplayView)findViewById(R.id.outputDisplay);
 		handler = new Handler(this);
 		display.setHandler(handler);
+		restartPoly();
+	}
+	
+	private void restartPoly() {
 		polyProcess = new RunPolyProcess(this);
 		polyProcess.start();
 	}
@@ -81,7 +86,7 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 			version = "Unknown";
 		}
 		
-		String text = new String("Poly/ML for Android version" + version + "\n\n");
+		String text = getString(R.string.about_text) + " " + version + "\n\n";
 		text += getString(R.string.all_about_poly);
 		View about = getLayoutInflater().inflate(R.layout.aboutpoly, null);
 		TextView aboutText = (TextView)about.findViewById(R.id.aboutText);
@@ -89,10 +94,10 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 		aboutText.setText(text);
 		Linkify.addLinks(aboutText, Linkify.ALL);
 		Builder dialogue = new AlertDialog.Builder(this);
-		dialogue.setTitle("About" + getString(R.string.app_name));
+		dialogue.setTitle(getString(R.string.about) + getString(R.string.app_name));
 		dialogue.setCancelable(true);
 		dialogue.setIcon(R.drawable.ic_launcher);
-		dialogue.setPositiveButton("OK", null);
+		dialogue.setPositiveButton(getString(R.string.ok), null);
 		dialogue.setView(about);
 		dialogue.show();
 	}
@@ -119,6 +124,31 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 		msg.setTarget(handler);
 		msg.sendToTarget();
 	}
+	
+	// When the Poly process dies put up a dialogue to ask whether to exit or restart
+	private void processHasDied() {
+		DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which) {
+				case DialogInterface.BUTTON_POSITIVE:
+					restartPoly();
+					break;
+					
+				case DialogInterface.BUTTON_NEGATIVE:
+					finish();
+					break;
+				}
+				
+			}
+		};
+		AlertDialog.Builder dialogue = new AlertDialog.Builder(this);
+		dialogue.setMessage(getString(R.string.has_finished));
+		dialogue.setPositiveButton(getString(R.string.restart), listener);
+		dialogue.setNegativeButton(getString(R.string.exit), listener);
+		dialogue.show();
+	}
 
 	@Override
 	public boolean handleMessage(Message msg) {
@@ -134,7 +164,7 @@ public class PolyGUIActivity extends Activity implements OutStream, Callback {
 			break;
 			
 		case POLY_PROCESS_DIED:
-			finish();
+			processHasDied();
 		}
 		return false;
 	}
