@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string-array name="heapsizeStrings">
+        <item name="50M">50 Mbytes</item>
+        <item name="100M">100 Mbytes</item>
+        <item name="500M">500 Mbytes</item>
+        <item name="1G">1 Gbyte</item>
+        </string-array>
+    
+    <string-array name="heapsizeValues">
+        <item name="50M">50M</item>
+        <item name="100M">100M</item>
+        <item name="500M">500M</item>
+        <item name="1G">1G</item>
+    </string-array>
+</resources>
