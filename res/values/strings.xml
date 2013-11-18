@@ -7,7 +7,7 @@
     <string name="settings">Settings</string>
     <string name="heapSizeTitle">Heap Size</string>
     <string name="heapSizeSummary">Set the maximum heap size</string>
-    <string name="defaultHeapSize">100</string>
+    <string name="defaultHeapSize">100M</string>
     <string name="interrupt">Send Interrupt</string>
     <string name="about_text">Poly/ML for Android version</string>
     <string name="about">About</string>
